@@ -15,5 +15,9 @@ if (BlueHUD_allowTeamColors) then {
 } else {
 	_color = [1,1,1];
 };
-_color pushBack (BlueHudCurrentAlpha min ((20 - (player distance _this)) / 15));
+if (captive _this) then {
+	_color pushBack ((BlueHudCurrentAlpha min ((20 - (player distance _this)) / 15)) * 0.5);
+} else {
+	_color pushBack (BlueHudCurrentAlpha min ((20 - (player distance _this)) / 15));
+};
 _color
