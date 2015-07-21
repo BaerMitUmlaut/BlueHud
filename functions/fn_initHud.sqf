@@ -1,8 +1,5 @@
-//Shutdown on HC
-if (!hasInterface && !isServer) exitWith {};
-
 //Distribute settings if server
-if (isServer && isMultiplayer) exitWith {
+if (isServer && isMultiplayer) then {
 	//Set constants
 	BLUEHUD_180 = 1;
 	BLUEHUD_MIDWAY = 2;
@@ -18,6 +15,9 @@ if (isServer && isMultiplayer) exitWith {
 
 	[[BlueHUD_allowedHUDModes, BlueHUD_allowTeamColors, BlueHUD_allowCompass], "BlueHud_fnc_setServerSettings", true, true] call BIS_fnc_MP;
 };
+
+//Shutdown on HC and Dedis
+if (!hasInterface) exitWith {};
 
 [] spawn {
 	//Load settings stored in profile, if not present use default settings
@@ -49,6 +49,8 @@ if (isServer && isMultiplayer) exitWith {
 	BlueHUD_allowTeamColors = true;
 	BlueHUD_allowCompass = true;
 
+	//For some reason, calling this to early kills the HUD
+	sleep 1;
 	("BHUDLayer" call BIS_fnc_rscLayer) cutRsc ["BlueHud", "PLAIN"];
 
 	//Center map on [0,0] for map zoom constant calculation
@@ -86,10 +88,10 @@ if (isServer && isMultiplayer) exitWith {
 		};
 	};
 
-	//Register settings keybind
-	["BlueHUD", "showSettingsKey", "Show settings", {createDialog "dlgBlueHudSettings";}, {}, [48, [true, true, false]]] call CBA_fnc_addKeybind;
-	["BlueHUD", "toggleHUDKey", "Toggle HUD", {(uiNamespace getVariable "BlueHudMap") ctrlShow !(ctrlShown (uiNamespace getVariable "BlueHudMap"))}, {}, [48, [true, false, true]]] call CBA_fnc_addKeybind;
-	["BlueHUD", "unfadeHUDKey", "Unfade HUD", {[] call BlueHud_fnc_unfade; false}, {}, [15, [false, false, false]]] call CBA_fnc_addKeybind;
+	//Register keybinds
+	["BlueHUD", "showSettingsKey", "Show settings", {createDialog "dlgBlueHudSettings"; true}, {false}, [48, [true, true, false]]] call CBA_fnc_addKeybind;
+	["BlueHUD", "toggleHUDKey", "Toggle HUD", {(uiNamespace getVariable "BlueHudMap") ctrlShow !(ctrlShown (uiNamespace getVariable "BlueHudMap")); true}, {false}, [48, [true, false, true]]] call CBA_fnc_addKeybind;
+	["BlueHUD", "unfadeHUDKey", "Unfade HUD", {[] call BlueHud_fnc_unfade; false}, {false}, [15, [false, false, false]]] call CBA_fnc_addKeybind;
 
 	BlueHud_initialized = true;
 };

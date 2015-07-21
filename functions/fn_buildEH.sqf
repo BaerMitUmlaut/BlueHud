@@ -81,14 +81,28 @@ _drawCompass = format ["if ('ItemCompass' in assignedItems player) then {
 };", _realCenter, _iconSizeBig];
 
 //Handles HUD fade-out
-_fade = "if (time - BlueHudLastUnfade > 5) then {
-	BlueHudCurrentAlpha = 0 max (BlueHudLastUnfade + 5.8 - time) * (((sunOrMoon max 0.1) + currentVisionMode player) min 1);
+_fade = "if (visibleMap) then {
+	BlueHudCurrentAlpha = 0;
+} else {
+	if (time - BlueHudLastUnfade > 5) then {
+		BlueHudCurrentAlpha = 0 max (BlueHudLastUnfade + 5.8 - time) * (((sunOrMoon max 0.1) + currentVisionMode player) min 1);
+	};
 };";
 
 //Handles HUD Alpha depending on daylight
-_dim = "BlueHudCurrentAlpha = 0.8 * (((sunOrMoon max 0.1) + currentVisionMode player) min 1);";
+_dim = "if (visibleMap) then {
+	BlueHudCurrentAlpha = 0;
+} else {
+	BlueHudCurrentAlpha = 0.8 * (((sunOrMoon max 0.1) + currentVisionMode player) min 1);
+};";
 
 _eventHandler = _header;
+
+if (BlueHudSettings select 4) then {
+	_eventHandler =  _eventHandler + _fade;
+} else {
+	_eventHandler =  _eventHandler + _dim;
+};
 
 if !(BlueHudSettings select 1) then {
 	_eventHandler = _eventHandler + _drawProximity;
@@ -102,12 +116,6 @@ if (BlueHudSettings select 2) then {
 
 if (BlueHudSettings select 0 && BlueHUD_allowCompass) then {
 	_eventHandler =  _eventHandler + _drawCompass;
-};
-
-if (BlueHudSettings select 4) then {
-	_eventHandler =  _eventHandler + _fade;
-} else {
-	_eventHandler =  _eventHandler + _dim;
 };
 
 _eventHandler =  _eventHandler + _footer;
